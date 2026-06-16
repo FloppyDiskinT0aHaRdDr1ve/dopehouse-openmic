@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOPEHOUSE OPENMIC — AI Music Creation Platform by Jacob Daniel Powell</title>
+    <meta name="description" content="DOPEHOUSE OPENMIC is a professional AI music creation platform by Jacob Daniel Powell. Generate music, lyrics, covers, and audio with AI. MCP-compatible server for Claude, VS Code, Cursor and more.">
+    <meta name="keywords" content="AI music, music generation, Suno API, MCP server, AI cover, stem separation, dopehouse, openmic">
+    <meta name="author" content="Jacob Daniel Powell">
+    <meta property="og:title" content="DOPEHOUSE OPENMIC — AI Music Creation Platform">
+    <meta property="og:description" content="Professional AI music generation platform by Jacob Daniel Powell. Generate, remix, and produce music with AI.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://dopehouseopenmic.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="DOPEHOUSE OPENMIC — AI Music Creation Platform">
+    <meta name="twitter:description" content="Professional AI music generation platform by Jacob Daniel Powell.">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0a0a0f;
+            color: #f0f0f0;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
+
+        /* Animated background grid */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image:
+                linear-gradient(rgba(233,69,96,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(233,69,96,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            pointer-events: none;
+            z-index: 0;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(233,69,96,0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(255,217,61,0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .container { position: relative; z-index: 1; }
+
+        /* Header / Nav */
+        nav {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .nav-brand {
+            display: flex; align-items: center; gap: 12px;
+            font-weight: 700; font-size: 1.2em; text-decoration: none; color: #fff;
+        }
+        .nav-brand svg { width: 32px; height: 32px; }
+        .nav-links { display: flex; gap: 32px; align-items: center; }
+        .nav-links a {
+            color: #999; text-decoration: none; font-size: 0.9em; font-weight: 500;
+            transition: color 0.2s; position: relative;
+        }
+        .nav-links a:hover { color: #fff; }
+        .nav-cta {
+            padding: 10px 24px; border-radius: 50px;
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: #fff !important; font-weight: 600 !important;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .nav-cta:hover { transform: translateY(-1px); box-shadow: 0 4px 20px rgba(233,69,96,0.4); }
+
+        /* Hero */
+        .hero {
+            text-align: center; padding: 100px 0 80px;
+            position: relative;
+        }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 8px 20px; border-radius: 50px;
+            background: rgba(233,69,96,0.1); border: 1px solid rgba(233,69,96,0.3);
+            font-size: 0.85em; color: #e94560; font-weight: 600; margin-bottom: 30px;
+        }
+        .hero h1 {
+            font-size: clamp(2.5em, 6vw, 4.5em);
+            font-weight: 900; line-height: 1.1; margin-bottom: 20px;
+            background: linear-gradient(135deg, #fff 0%, #e94560 50%, #ffd93d 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero p {
+            font-size: 1.2em; color: #888;
+            max-width: 680px; margin: 0 auto 40px;
+            line-height: 1.7;
+        }
+        .hero-actions { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            display: inline-flex; align-items: center; gap: 10px;
+            padding: 16px 36px; border-radius: 50px;
+            font-size: 1em; font-weight: 600; text-decoration: none;
+            transition: all 0.25s ease; cursor: pointer; border: none;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #e94560, #ff6b6b);
+            color: #fff; box-shadow: 0 4px 25px rgba(233,69,96,0.35);
+        }
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(233,69,96,0.5);
+        }
+        .btn-secondary {
+            background: rgba(255,255,255,0.06); color: #f0f0f0;
+            border: 1px solid rgba(255,255,255,0.12);
+        }
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1); transform: translateY(-2px);
+        }
+        .hero-stats {
+            display: flex; justify-content: center; gap: 60px; margin-top: 60px;
+            padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.06);
+        }
+        .hero-stat { text-align: center; }
+        .hero-stat-value {
+            font-size: 1.8em; font-weight: 800;
+            background: linear-gradient(135deg, #ffd93d, #ff6b6b);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .hero-stat-label { font-size: 0.85em; color: #666; margin-top: 4px; }
+
+        /* Sections common */
+        section { padding: 100px 0; }
+        .section-label {
+            display: inline-block; font-size: 0.85em; font-weight: 700;
+            color: #e94560; text-transform: uppercase; letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+        .section-title {
+            font-size: clamp(1.8em, 4vw, 2.8em); font-weight: 800;
+            margin-bottom: 16px; line-height: 1.2;
+        }
+        .section-subtitle {
+            font-size: 1.1em; color: #888; max-width: 600px; margin-bottom: 50px;
+        }
+        .text-center { text-align: center; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+
+        /* Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .feature-card {
+            background: linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 20px; padding: 32px;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
+        }
+        .feature-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, #e94560, #ffd93d);
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .feature-card:hover {
+            border-color: rgba(233,69,96,0.3); transform: translateY(-4px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .feature-card:hover::before { opacity: 1; }
+        .feature-icon {
+            width: 48px; height: 48px; border-radius: 14px;
+            background: rgba(233,69,96,0.1);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4em; margin-bottom: 20px;
+        }
+        .feature-card h3 { font-size: 1.15em; font-weight: 700; margin-bottom: 10px; color: #fff; }
+        .feature-card p { font-size: 0.95em; color: #777; line-height: 1.7; }
+
+        /* Tools */
+        .tools-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+        }
+        .tool-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 20px;
+            display: flex; align-items: center; gap: 14px;
+            transition: all 0.2s;
+        }
+        .tool-item:hover {
+            border-color: rgba(233,69,96,0.3);
+            background: rgba(233,69,96,0.05);
+        }
+        .tool-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #e94560; flex-shrink: 0;
+        }
+        .tool-item span { font-size: 0.95em; font-weight: 500; }
+        .tool-item small { display: block; font-size: 0.8em; color: #666; font-weight: 400; }
+
+        /* Download */
+        .download-section {
+            background: linear-gradient(145deg, rgba(233,69,96,0.06), transparent);
+            border-radius: 24px; padding: 80px 60px;
+            border: 1px solid rgba(233,69,96,0.12);
+            margin: 0 24px;
+        }
+        .download-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px; margin-top: 50px;
+        }
+        .download-card {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px; padding: 32px;
+            text-align: center; transition: all 0.3s;
+        }
+        .download-card:hover { border-color: rgba(233,69,96,0.3); transform: translateY(-2px); }
+        .download-card h4 { font-size: 1.1em; margin-bottom: 8px; }
+        .download-card p { font-size: 0.9em; color: #777; margin-bottom: 20px; }
+        .download-card .btn { width: 100%; justify-content: center; }
+        .download-card .file-info { font-size: 0.8em; color: #555; margin-top: 12px; }
+
+        /* Quick Start */
+        .quickstart {
+            background: rgba(0,0,0,0.3);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 16px;
+            overflow: hidden; margin-top: 50px;
+        }
+        .quickstart-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .quickstart-header span { font-weight: 600; font-size: 0.95em; }
+        .quickstart-header small { color: #666; font-size: 0.8em; }
+        .quickstart-body {
+            padding: 24px; overflow-x: auto;
+        }
+        .quickstart-body pre {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            font-size: 0.9em; line-height: 1.7; color: #a0e8a0;
+        }
+        .quickstart-body code { color: #ffd93d; }
+
+        /* Requirements */
+        .req-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .req-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 12px; padding: 24px; text-align: center;
+        }
+        .req-item .label { font-size: 0.85em; color: #888; margin-bottom: 6px; }
+        .req-item .value { font-size: 1.05em; font-weight: 600; }
+
+        /* Footer */
+        footer {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding: 60px 0 40px;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px; margin-bottom: 40px;
+        }
+        .footer-brand p { color: #666; font-size: 0.9em; margin-top: 12px; max-width: 300px; }
+        .footer-col h5 { font-size: 0.85em; color: #fff; margin-bottom: 16px; font-weight: 700; }
+        .footer-col a {
+            display: block; color: #666; text-decoration: none;
+            font-size: 0.9em; margin-bottom: 10px; transition: color 0.2s;
+        }
+        .footer-col a:hover { color: #e94560; }
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 24px;
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.85em; color: #555;
+        }
+        .footer-bottom a { color: #888; text-decoration: none; }
+        .footer-bottom a:hover { color: #e94560; }
+
+        /* Animations */
+        .fade-in {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+        .fade-in.visible { opacity: 1; transform: translateY(0); }
+
+        /* Hamburger menu */
+        .menu-toggle { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: 4px; }
+        .menu-toggle span { width: 24px; height: 2px; background: #fff; border-radius: 2px; transition: 0.3s; }
+
+        @media (max-width: 900px) {
+            .footer-grid { grid-template-columns: 1fr 1fr; }
+            .download-options { grid-template-columns: 1fr; }
+            .download-section { padding: 50px 24px; margin: 0 0; border-radius: 0; }
+            .hero-stats { gap: 30px; flex-wrap: wrap; }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; position: absolute; top: 80px; left: 0; right: 0; background: #0a0a0f; flex-direction: column; padding: 20px; border-bottom: 1px solid rgba(255,255,255,0.06); z-index: 100; }
+            .nav-links.open { display: flex; }
+            .menu-toggle { display: flex; }
+            .hero { padding: 60px 0 50px; }
+            section { padding: 60px 0; }
+        }
+        @media (max-width: 480px) {
+            .hero-stats { flex-direction: column; gap: 20px; }
+            .hero-actions { flex-direction: column; align-items: stretch; }
+            .hero-actions .btn { justify-content: center; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <nav>
+            <a href="#" class="nav-brand">
+                <svg viewBox="0 0 512 512" width="32" height="32">
+                    <circle cx="256" cy="256" r="248" fill="none" stroke="#e94560" stroke-width="8"/>
+                    <rect x="216" y="140" width="80" height="120" rx="40" ry="40" fill="#e94560"/>
+                    <rect x="244" y="260" width="24" height="20" rx="4" fill="#ffd93d"/>
+                    <line x1="256" y1="280" x2="256" y2="310" stroke="#ffd93d" stroke-width="6" stroke-linecap="round"/>
+                    <line x1="220" y1="310" x2="292" y2="310" stroke="#ffd93d" stroke-width="6" stroke-linecap="round"/>
+                    <polygon points="256,100 259,110 270,110 261,117 264,128 256,121 248,128 251,117 242,110 253,110" fill="#ffd93d"/>
+                </svg>
+                DOPEHOUSE OPENMIC
+            </a>
+            <button class="menu-toggle" onclick="this.classList.toggle('active');document.querySelector('.nav-links').classList.toggle('open')">
+                <span></span><span></span><span></span>
+            </button>
+            <div class="nav-links">
+                <a href="#features">Features</a>
+                <a href="#tools">Tools</a>
+                <a href="#download">Download</a>
+                <a href="#docs">Docs</a>
+                <a href="#download" class="nav-cta">Get Started</a>
+            </div>
+        </nav>
+    </div>
+
+    <section class="hero container">
+        <div class="hero-badge">v1.0.0 &mdash; Now Available</div>
+        <h1>Create Professional<br>AI Music in Seconds</h1>
+        <p>DOPEHOUSE OPENMIC is a powerful MCP server that connects to the Suno API, enabling music generation, covers, stem separation, and remixing from any MCP-compatible client.</p>
+        <div class="hero-actions">
+            <a href="#download" class="btn btn-primary">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                Download for Windows
+            </a>
+            <a href="#tools" class="btn btn-secondary">Explore Features</a>
+        </div>
+        <div class="hero-stats">
+            <div class="hero-stat">
+                <div class="hero-stat-value">17+</div>
+                <div class="hero-stat-label">MCP Tools</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">3</div>
+                <div class="hero-stat-label">Prompt Templates</div>
+            </div>
+            <div class="hero-stat">
+                <div class="hero-stat-value">MCP</div>
+                <div class="hero-stat-label">Standard Protocol</div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="container text-center">
+        <div class="section-label">Platform</div>
+        <h2 class="section-title">Everything You Need to Create Music with AI</h2>
+        <p class="section-subtitle mx-auto">A complete toolkit for AI music production — from generation to mastering, all through a single MCP server.</p>
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🎵</div>
+                <h3>Music Generation</h3>
+                <p>Create original songs from text prompts. Describe the genre, mood, and instrumentation — the AI handles composition and production.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📝</div>
+                <h3>Custom Lyrics &amp; Style</h3>
+                <p>Full control over lyrics, title, and music style. Write your own lyrics or let AI generate them. Fine-tune genre, BPM, and vocal characteristics.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🎤</div>
+                <h3>Voice Personas</h3>
+                <p>Save and reuse vocal styles across songs. Create consistent voices for your entire album with custom persona presets.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🔄</div>
+                <h3>Cover &amp; Remix</h3>
+                <p>Transform existing songs into new styles. Turn pop into jazz, rock into acoustic, or any genre cross-over with AI-powered covers and mashups.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">📊</div>
+                <h3>Stem Separation</h3>
+                <p>Extract vocals, drums, bass, and other instruments from any audio. Isolate individual tracks for remixing and production.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">🔗</div>
+                <h3>MCP Compatible</h3>
+                <p>Seamless integration with Claude, VS Code, Cursor, JetBrains, and any MCP-compatible client. Works over HTTP or stdio transport.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="tools" class="container text-center" style="padding-top:0;">
+        <div class="section-label">Capabilities</div>
+        <h2 class="section-title">17 MCP Tools at Your Command</h2>
+        <p class="section-subtitle mx-auto">Every aspect of music creation and manipulation available through simple tool calls.</p>
+        <div class="tools-grid" style="text-align:left;">
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Generate Music</span><small>Create songs from text prompts</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Generate with Lyrics</span><small>Full custom lyrics support</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Extend Audio</span><small>Continue and extend existing tracks</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Create Cover</span><small>Reimagine songs in new styles</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Stem Separation</span><small>Extract individual instruments</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Voice Personas</span><small>Save and reuse vocal styles</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Mashup Creator</span><small>Blend multiple songs together</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Underpainting</span><small>Generate audio over reference tracks</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Replace Section</span><small>Swap parts of existing songs</small></div></div>
+            <div class="tool-item fade-in"><div class="tool-dot"></div><div><span>Style Optimizer</span><small>Enhance prompt descriptions</small></div></div>
+        </div>
+    </section>
+
+    <section id="download" class="download-section container">
+        <div class="text-center">
+            <div class="section-label">Get Started</div>
+            <h2 class="section-title">Download DOPEHOUSE OPENMIC</h2>
+            <p style="color:#888; max-width:600px; margin:0 auto;">Choose your installation method and start creating AI music in minutes. Created by Jacob Daniel Powell.</p>
+        </div>
+        <div class="download-options">
+            <div class="download-card fade-in">
+                <div style="font-size:2.5em; margin-bottom:12px;">🪟</div>
+                <h4>Windows Installer</h4>
+                <p>One-click setup with desktop shortcut, Start Menu entry, and automatic .env configuration. No Python required.</p>
+                <a href="DOPEHOUSE-OPENMIC-Setup-1.0.0.exe" class="btn btn-primary" download>Download Installer</a>
+                <div class="file-info">DOPEHOUSE-OPENMIC-Setup-1.0.0.exe &bull; 24 MB</div>
+            </div>
+            <div class="download-card fade-in">
+                <div style="font-size:2.5em; margin-bottom:12px;">🐍</div>
+                <h4>Install via pip</h4>
+                <p>For Python users. Install globally or in a virtual environment. Works on Windows, macOS, and Linux.</p>
+                <a href="#" class="btn btn-secondary">pip install dopehouse-openmic</a>
+                <div class="file-info">Comming soon to PyPI</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container" style="padding-top:60px;">
+        <div class="text-center">
+            <div class="section-label">Quick Start</div>
+            <h2 class="section-title">Up and Running in 3 Steps</h2>
+            <p class="section-subtitle mx-auto">After installing, follow these steps to connect and start generating music.</p>
+        </div>
+        <div class="quickstart fade-in">
+            <div class="quickstart-header">
+                <span>Terminal</span>
+                <small>dopehouse-openmic</small>
+            </div>
+            <div class="quickstart-body">
+                <pre><span style="color:#888;"># Step 1: Get your API token</span>
+<span style="color:#555;"># Visit https://platform.acedata.cloud and sign up for an API key</span>
+
+<span style="color:#888;"># Step 2: Launch the server</span>
+dopehouse-openmic --transport http --port 8000
+
+<span style="color:#888;"># Step 3: Connect from your MCP client</span>
+<span style="color:#555;"># In Claude, Cursor, or VS Code, add an MCP server:</span>
+<span style="color:#ffd93d;">URL:</span> http://localhost:8000/mcp
+<span style="color:#ffd93d;">Authorization:</span> Bearer &lt;your-api-token&gt;</pre>
+            </div>
+        </div>
+    </section>
+
+    <section class="container text-center" style="padding-top:60px;">
+        <div class="section-label">System Requirements</div>
+        <h2 class="section-title">Lightweight &amp; Cross-Platform</h2>
+        <p class="section-subtitle mx-auto">Minimal dependencies. Runs on any modern system with Python or via the standalone Windows executable.</p>
+        <div class="req-grid" style="margin-top:40px;">
+            <div class="req-item fade-in"><div class="label">OS</div><div class="value">Windows 10+</div></div>
+            <div class="req-item fade-in"><div class="label">RAM</div><div class="value">512 MB</div></div>
+            <div class="req-item fade-in"><div class="label">Storage</div><div class="value">100 MB</div></div>
+            <div class="req-item fade-in"><div class="label">Python</div><div class="value">3.10+ (pip)</div></div>
+            <div class="req-item fade-in"><div class="label">API</div><div class="value">AceDataCloud Key</div></div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <strong style="font-size:1.1em;">DOPEHOUSE OPENMIC</strong>
+                    <p>A professional AI music creation platform built by Jacob Daniel Powell. Generate, remix, and produce music with artificial intelligence.</p>
+                </div>
+                <div class="footer-col">
+                    <h5>Product</h5>
+                    <a href="#features">Features</a>
+                    <a href="#tools">Tools</a>
+                    <a href="#download">Download</a>
+                    <a href="#docs">Documentation</a>
+                </div>
+                <div class="footer-col">
+                    <h5>Resources</h5>
+                    <a href="https://platform.acedata.cloud" target="_blank">AceDataCloud</a>
+                    <a href="https://modelcontextprotocol.io" target="_blank">MCP Protocol</a>
+                    <a href="https://github.com/FloppyDiskinT0aHaRdDr1ve" target="_blank">GitHub</a>
+                </div>
+                <div class="footer-col">
+                    <h5>Legal</h5>
+                    <a href="#">Privacy Policy</a>
+                    <a href="#">Terms of Service</a>
+                    <a href="#">License</a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>&copy; 2026 Jacob Daniel Powell. All rights reserved.</span>
+                <span>Made with passion by <a href="https://github.com/FloppyDiskinT0aHaRdDr1ve" target="_blank">Jacob Daniel Powell</a></span>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Intersection Observer for fade-in animations
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+                // Close mobile menu
+                document.querySelector('.nav-links')?.classList.remove('open');
+            });
+        });
+    </script>
+</body>
+</html>
