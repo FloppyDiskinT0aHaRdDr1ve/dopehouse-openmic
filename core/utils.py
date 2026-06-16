@@ -1,0 +1,111 @@
+"""Utility functions for DOPEHOUSE OPENMIC."""
+
+import json
+from typing import Any
+
+
+def _with_submission_guidance(
+    data: dict[str, Any], poll_tool: str, batch_poll_tool: str | None = None
+) -> dict[str, Any]:
+    payload = dict(data)
+    task_id = payload.get("task_id")
+    if not task_id:
+        return payload
+    payload["mcp_async_submission"] = {
+        "task_id": task_id,
+        "poll_tool": poll_tool,
+        "batch_poll_tool": batch_poll_tool,
+        "recommended_action": "poll",
+        "should_poll": True,
+        "terminal_state_reached": False,
+        "polling_interval_seconds": 15,
+        "max_poll_attempts": 100,
+        "expected_wait_seconds": 600,
+        "next_step": (
+            f'Call {poll_tool}(task_id="{task_id}") to poll until the task completes '
+            f"and the final media URLs are available. "
+            f"IMPORTANT: Media generation typically takes 1-5 minutes. "
+            f"Wait at least 15 seconds between each poll. "
+            f"Keep polling for up to 100 attempts. Do NOT stop early."
+        ),
+    }
+    return payload
+
+
+def _with_task_guidance(
+    data: dict[str, Any], poll_tool: str, batch_poll_tool: str | None = None
+) -> dict[str, Any]:
+    payload = dict(data)
+    task_id = payload.get("id") or payload.get("task_id")
+    if not task_id:
+        return payload
+    state = payload.get("state", "")
+    response = payload.get("response", {})
+    success = response.get("success", False) if isinstance(response, dict) else False
+    if state == "complete" and success:
+        payload["mcp_task_polling"] = {
+            "task_id": task_id,
+            "state": state,
+            "is_complete": True,
+            "is_failed": False,
+            "should_poll": False,
+            "terminal_state_reached": True,
+            "recommended_action": "stop",
+            "note": "Task is complete. The audio URLs are final and ready to present to the user.",
+        }
+    else:
+        is_failed = str(state).lower() in {"failed", "error", "cancelled", "canceled"}
+        payload["mcp_task_polling"] = {
+            "task_id": task_id,
+            "poll_tool": poll_tool,
+            "batch_poll_tool": batch_poll_tool,
+            "state": state,
+            "is_complete": False,
+            "is_failed": is_failed,
+            "should_poll": not is_failed,
+            "terminal_state_reached": is_failed,
+            "recommended_action": "stop" if is_failed else "poll",
+            "polling_interval_seconds": 15,
+            "max_poll_attempts": 100,
+            "next_step": (
+                f'Task is NOT complete yet (state: "{state}"). '
+                f'IMPORTANT: Only state="complete" with success=true means the task is finished. '
+                f"Ignore any intermediate audio_url values. "
+                f'Wait 15 seconds, then call {poll_tool}(task_id="{task_id}") again. '
+                f"Media generation typically takes 1-5 minutes. "
+                f"Keep polling for up to 100 attempts. Do NOT stop early."
+            ),
+        }
+    return payload
+
+
+def format_audio_result(data: dict[str, Any]) -> str:
+    return json.dumps(
+        _with_submission_guidance(data, "suno_get_task", "suno_get_tasks_batch"),
+        ensure_ascii=False,
+        indent=2,
+    )
+
+
+def format_lyrics_result(data: dict[str, Any]) -> str:
+    return json.dumps(
+        _with_submission_guidance(data, "suno_get_task", "suno_get_tasks_batch"),
+        ensure_ascii=False,
+        indent=2,
+    )
+
+
+def format_task_result(data: dict[str, Any]) -> str:
+    return json.dumps(
+        _with_task_guidance(data, "suno_get_task", "suno_get_tasks_batch"),
+        ensure_ascii=False,
+        indent=2,
+    )
+
+
+def format_persona_result(data: dict[str, Any]) -> str:
+    return json.dumps(
+        _with_submission_guidance(data, "suno_get_task", "suno_get_tasks_batch"),
+        ensure_ascii=False,
+        indent=2,
+    )
